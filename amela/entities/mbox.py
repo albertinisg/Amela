@@ -19,7 +19,7 @@
 # Authors:
 #   Alberto Martín <alberto.martin@bitergia.com>
 #
-from ..entities import Entity
+from .core import Entity
 
 
 class List(Entity):

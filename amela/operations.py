@@ -30,7 +30,7 @@ def table(search):
 def ts(search, entity):
     pass
 
-def onion(search, entity1, entity2):
+def onion(search, entity1, entity2, index_name):
     """ onion returns the onion model of any type of entity
     The onion model is defined as the number of developers
     contributing up to a 80% of the code (core), regular
@@ -55,7 +55,7 @@ def onion(search, entity1, entity2):
     """
 
     s = search.bucket(TermsBucket(entity2))
-    result = s.solve()
+    result = s.solve(index_name)
 
     #TODO: return all of the elements, and not a subset
     list_elements = result.to_dict()['aggregations']

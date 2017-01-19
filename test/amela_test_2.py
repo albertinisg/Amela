@@ -34,10 +34,11 @@ from amela.query import Search
 from amela.query_metrics import UniqueCount
 from amela.query_metrics import Average
 from amela.query_buckets import TermsBucket
-from amela.entities import Author
-from amela.entities import Commit
-from amela.entities import Repo
-from amela.entities import File
+from amela.entities.core import Author
+from amela.entities.core import Commit
+from amela.entities.core import Repo
+from amela.entities.core import File
+from amela.entities.mbox import List
 
 def pretty_print(json_str):
     print('R=\n', utils.beautify(json_str))
@@ -46,22 +47,22 @@ def test_query():
 
     print("Unique Count Authors")
     q = Query().metric(UniqueCount(Author))
-    r = q.solve()
+    r = q.solve('git_enrich')
     pretty_print(r.to_dict()['aggregations'])
 
     print("Unique Count Commits")
     q = Query().metric(UniqueCount(Commit))
-    r = q.solve()
+    r = q.solve('git_enrich')
     pretty_print(r.to_dict()['aggregations'])
 
     print("Unique Count Repos")
     q = Query().metric(UniqueCount(Repo))
-    r = q.solve()
+    r = q.solve('git_enrich')
     pretty_print(r.to_dict()['aggregations'])
 
     print("Unique Count Commits by Repo")
     q = Query().bucket(TermsBucket(Repo)).metric(UniqueCount(Commit))
-    r = q.solve()
+    r = q.solve('git_enrich')
     pretty_print(r.to_dict()['aggregations'])
 
     print("Unique Count Commits, Author and Avg Files by Repo")
@@ -70,14 +71,14 @@ def test_query():
         .metric(UniqueCount(Commit)) \
         .metric(UniqueCount(Author)) \
         .metric(Average(File))
-    r = q.solve()
+    r = q.solve('git_enrich')
     pretty_print(r.to_dict()['aggregations'])
 
     print("Bucketize by Repo and then by Commit")
     q = Query() \
         .bucket(TermsBucket(Repo)) \
         .bucket(TermsBucket(Commit))
-    r = q.solve()
+    r = q.solve('git_enrich')
     pretty_print(r.to_dict()['aggregations'])
 
 
@@ -89,7 +90,7 @@ def test_search():
     p = app.only(s, Author, 'Santiago Dueñas')
     uc = app.unique_count(p)
     sp = app.split(uc)
-    r = sp.solve()
+    r = sp.solve('git_enrich')
     pretty_print(r.to_dict()['aggregations'])
 
     print("Unique Count Commits by Author by Month")
@@ -97,26 +98,26 @@ def test_search():
     p = app.only(s, Author, 'Santiago Dueñas')
     uc = app.unique_count(p)
     sp = app.split(uc)
-    r = sp.solve()
+    r = sp.solve('git_enrich')
     pretty_print(r.to_dict()['aggregations'])
 
     print("Unique Count Authors by Month")
     s = Search(Author)
     uc = app.unique_count(s)
     sp = app.split(uc)
-    r = sp.solve()
+    r = sp.solve('git_enrich')
     pretty_print(r.to_dict()['aggregations'])
 
     print("Average Files by Month")
     s = Search(File)
     uc = app.average(s)
     sp = app.split(uc)
-    r = sp.solve()
+    r = sp.solve('git_enrich')
     pretty_print(r.to_dict()['aggregations'])
 
     print("Onion Study")
     s = Search(Commit(), Author)
-    result = app.onion(s, Commit(), Author())
+    result = app.onion(s, Commit(), Author(), 'git_enrich')
     print(result)
 
     print("Commits per project")
@@ -124,10 +125,14 @@ def test_search():
     aut = app.unique_count(s, entity=Author())
     org = app.unique_count(aut, entity=Repo())
     com = app.unique_count(org)
-    r = com.solve()
+    r = com.solve('git_enrich')
     pretty_print(r.to_dict()['aggregations'])
 
-
+    print("Unique Count Authors by List")
+    s = Search(Author(), List())
+    uc = app.unique_count(s)
+    r = uc.solve('mbox_enrich')
+    pretty_print(r.to_dict()['aggregations'])
 
 def print_header(text):
     print("\n_________")

@@ -64,11 +64,11 @@ class Query:
     def clone(self):
         return copy.deepcopy(self)
 
-    def solve(self):
+    def solve(self, index_name):
 
         db =  {
-            'es_hosts' : ["http://127.0.0.1:9200"],
-            'dbname' : 'git'
+            'es_hosts' : ["https://bitergia:B1t3r_Es.K1b@eclipse.biterg.io:443/data"],
+            'dbname' : index_name
         }
 
         client = elasticsearch.Elasticsearch(db['es_hosts'])

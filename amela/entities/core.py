@@ -33,17 +33,13 @@ class Entity:
 class Author(Entity):
     field_name = 'author_name'
 
-# class ClosedIssue(Entity):
-#
-#     def __init__(self):
-#         self._filters.append(ClosedFilter)
-
 class Commit(Entity):
     field_name = 'hash'
 
     def __init__(self, filter_merges=True):
-        if filter_merges:
-            self.filters.append(GreaterThan(File, 0))
+        pass
+        # if filter_merges:
+        #     self.filters.append(GreaterThan(File, 0))
 
 class Repo(Entity):
     field_name = 'repo_name'
